@@ -1,4 +1,7 @@
+
 import 'package:flutter/material.dart';
+import 'consulta_cep_fragment.dart';
+import 'lista_cidades_fragment.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -10,14 +13,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   var _fragmentIndex = 0;
- // final _listaCidadesKey = GlobalKey<ListaCidadesFragmentState>();
+  //final _listaCidadesKey = GlobalKey<_ListaCidadesFragmentState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //title: Text(_fragmentIndex == 0
-          //  ? ConsultaCepFragment.title : ListaCidadesFragment.title),
+        title: Text(_fragmentIndex == 0
+            ? ConsultaCepFragment.title : ListaCidadesFragment.title),
       ),
       body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(
@@ -25,11 +28,11 @@ class _HomePageState extends State<HomePage> {
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.search),
-           // label: ConsultaCepFragment.title,
+            label: ConsultaCepFragment.title,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.list),
-           // label: ListaCidadesFragment.title,
+            label: ListaCidadesFragment.title,
           ),
         ],
         onTap: (int newIndex) {
@@ -44,17 +47,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //Widget _buildBody() => _fragmentIndex == 0
-      //? ConsultaCepFragment() : ListaCidadesFragment(key: _listaCidadesKey);
+  Widget _buildBody() => _fragmentIndex == 0
+      ? ConsultaCepFragment() : ListaCidadesFragment();
 
   Widget? _buildFloatingActionButton() {
     if (_fragmentIndex == 0) {
       return null;
     }
-    return FloatingActionButton(
-      child: const Icon(Icons.add),
+    return const FloatingActionButton(
+      child: Icon(Icons.add),
       tooltip: 'Cadastrar Cidade',
-      //onPressed: () => _listaCidadesKey.currentState?.abrirForm(),
+      onPressed: null//() => _listaCidadesKey.currentState?.abrirForm(),
     );
   }
 

@@ -18,7 +18,7 @@ class _ConsultaCepFragmentState extends State<ConsultaCepFragment>{
     final _service = CepService();
     final _controller = TextEditingController();
     final _formKey = GlobalKey<FormState>();
-    bool _loading = false;
+    var _loading = false;
     final _cepFormatter = MaskTextInputFormatter(
         mask: '#####-###',
         filter: {'#' : RegExp(r'[0-9]')}
@@ -78,10 +78,10 @@ class _ConsultaCepFragmentState extends State<ConsultaCepFragment>{
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text('Ocorreu um erro ao consultar o CEP. Tente novamente'),
             ));
-            setState(() {
-              _loading = false;
-            });
         }
+        setState(() {
+            _loading = false;
+        });
     }
     List<Widget> _buildResultWidgets(){
         final List<Widget> widgets = [];

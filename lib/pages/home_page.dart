@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
   var _fragmentIndex = 0;
-  //final _listaCidadesKey = GlobalKey<_ListaCidadesFragmentState>();
+  final _listaCidadesKey = GlobalKey<ListaCidadesFragmentState>();
 
   @override
   Widget build(BuildContext context) {
@@ -48,16 +48,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBody() => _fragmentIndex == 0
-      ? ConsultaCepFragment() : ListaCidadesFragment();
+      ? ConsultaCepFragment() : ListaCidadesFragment(key: _listaCidadesKey);
 
   Widget? _buildFloatingActionButton() {
     if (_fragmentIndex == 0) {
       return null;
     }
-    return const FloatingActionButton(
-      child: Icon(Icons.add),
+    return FloatingActionButton(
+      child: const Icon(Icons.add),
       tooltip: 'Cadastrar Cidade',
-      onPressed: null//() => _listaCidadesKey.currentState?.abrirForm(),
+      onPressed: () => _listaCidadesKey.currentState?.abrirForm(),
     );
   }
 

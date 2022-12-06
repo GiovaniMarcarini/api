@@ -38,7 +38,7 @@ class _FormCidadeState extends State<FormCidadePage> {
   Widget build(BuildContext context){
     return Scaffold(
       appBar: _buildAppBar(),
-      body: null//_buildBody(),
+      body: _buildBody(),
     );
   }
 
@@ -73,11 +73,98 @@ class _FormCidadeState extends State<FormCidadePage> {
       actions: [
         if (!_saving)
         IconButton(
-          icon: Icon(Icons.check),
-          onPressed: null//_save,
+          icon: const Icon(Icons.check),
+          onPressed: _save,
         ),
       ],
     );
+  }
+  Widget _buildBody() => Padding(
+    padding: EdgeInsets.all(10),
+    child: SingleChildScrollView(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if(widget.cidade!.codigo != null)
+              Text('Có[digo: ${widget.cidade!.codigo}'),
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Nome',
+              ),
+              controller: _nomeController,
+              validator: (String? newValue){
+                if (newValue == null || newValue.trim().isEmpty){
+                  return 'Informe o Nome';
+                }
+                return null;
+              },
+            ),
+            DropdownButtonFormField(
+              value: _currentUf,
+              decoration: const InputDecoration(
+                labelText: 'UF',
+              ),
+              items: _buildDropMenuItem(),
+              onChanged: (String? newValue){
+                setState(() {
+                  _currentUf = newValue;
+                });
+              },
+              validator: (String? newValue){
+                if(newValue == null || newValue.trim().isEmpty){
+                  return 'Informe a UF';
+                }
+                return null;
+              }
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+
+  List<DropdownMenuItem<String>> _buildDropMenuItem(){
+    const ufs = [
+      'AC', 'AL', 'AP', 'AM','BA','CE', 'DF','ES','GO', 'MA','PR','SC', 'RS', 'SP', 'MT'
+    ];
+    final List<DropdownMenuItem<String>> items = [];
+    for( final uf in ufs){
+      items.add(DropdownMenuItem<String>(
+        value: uf,
+        child: Text(uf),
+      )
+      );
+    }
+    return items;
+  }
+
+  Future<void> _save() async{
+    if(_formKey.currentState == null || !_formKey.currentState!.validate()){
+      return;
+    }
+    setState(() {
+      _saving = true;
+    });
+    try{
+      await _service.saveCidade(Cidade(
+        codigo: widget.cidade?.codigo,
+          nome: _nomeController.text,
+          uf: _currentUf!,
+      ),
+      );
+      Navigator.pop(context, true);
+      return;
+    }catch (e){
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Não foi possível salvar a cidade, tente novamente.'),
+      ));
+    }
+    setState(() {
+      _saving = false;
+    });
   }
 
 }

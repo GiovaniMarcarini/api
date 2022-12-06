@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../model/cidade.dart';
 
-class ListaCidadesFragment extends StatefulWidget{
+class ListaCidadesFragment extends StatefulWidget {
   static const title = 'Cidades';
 
   const ListaCidadesFragment({Key? key}) : super(key: key);
@@ -18,29 +18,30 @@ class ListaCidadesFragment extends StatefulWidget{
   @override
   State<StatefulWidget> createState() => ListaCidadesFragmentState();
 }
+
 class ListaCidadesFragmentState extends State<ListaCidadesFragment> {
   final _service = CidadeService();
-  final List<Cidade> _cidade = [];
-  final _refreshIndicatorkey = GlobalKey<RefreshIndicatorState>();
+  final List<Cidade> _cidades = [];
+  final _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   @override
-  void initiState() {
+  void initState() {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      _refreshIndicatorkey.currentState?.show();
+      _refreshIndicatorKey.currentState?.show();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: LayoutBuilder(
         builder: (_, constraints) {
           Widget content;
-          if (_cidade.isEmpty) {
+          if (_cidades.isEmpty) {
             content = SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(),
               child: SizedBox(
                 width: constraints.maxWidth,
                 height: constraints.maxHeight,
@@ -51,19 +52,19 @@ class ListaCidadesFragmentState extends State<ListaCidadesFragment> {
             );
           } else {
             content = ListView.separated(
-              itemCount: _cidade.length,
+              itemCount: _cidades.length,
               itemBuilder: (_, index) {
-                final cidade = _cidade[index];
+                final cidade = _cidades[index];
                 return ListTile(
                   title: Text('${cidade.nome} - ${cidade.uf}'),
-                  onTap: () => _montrarDialogActions(cidade),
+                  onTap: () => _mostrarDialogActions(cidade),
                 );
               },
-              separatorBuilder: (_, __) => Divider(),
+              separatorBuilder: (_, __) => const Divider(),
             );
           }
           return RefreshIndicator(
-            key: _refreshIndicatorkey,
+            key: _refreshIndicatorKey,
             child: content,
             onRefresh: _findCidades,
           );
@@ -73,89 +74,94 @@ class ListaCidadesFragmentState extends State<ListaCidadesFragment> {
   }
 
   Future<void> _findCidades() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(Duration(seconds: 2));
     final cidades = await _service.findCidades();
     setState(() {
-      _cidade.clear();
+      _cidades.clear();
       if (cidades.isNotEmpty) {
-        _cidade.addAll(cidades);
+        _cidades.addAll(cidades);
       }
     });
   }
 
-  void _montrarDialogActions(Cidade cidade) {
+  void _mostrarDialogActions(Cidade cidade) {
     showDialog(
-        context: context,
-        builder: (_) =>
-            AlertDialog(
-              title: Text('${cidade.nome} - ${cidade.uf}'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.edit),
-                    title: const Text('Editar'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      abrirForm(cidade: cidade);
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    leading: const Icon(Icons.delete,
-                        color: Colors.red),
-                    title: const Text('Excluir'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _excluirCidade(cidade);
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancelar'),
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text('${cidade.nome} - ${cidade.uf}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Editar'),
+                onTap: () {
+                  Navigator.pop(context);
+                  abrirForm(cidade: cidade);
+                }
+            ),
+            const Divider(),
+            ListTile(
+                leading: const Icon(
+                  Icons.delete,
+                  color: Colors.red,
                 ),
-              ],
-            )
+                title: const Text('Excluir'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _excluir(cidade);
+                }
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
     );
   }
 
   void abrirForm({Cidade? cidade}) {
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (_) => FormCidadePage(cidade: cidade)
+      builder: (_) => FormCidadePage(cidade: cidade),
     )).then((changed) {
       if (changed == true) {
-        _refreshIndicatorkey.currentState?.show();
+        _refreshIndicatorKey.currentState?.show();
       }
     });
   }
-  void _excluirCidade(Cidade cidade){
+
+  void _excluir(Cidade cidade) {
     showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          title: Text('Atenção'),
-          content: Text('O registro "${cidade.nome} - ${cidade.uf}" será deletado definitivamente'),
-          actions: [
-            TextButton(
-                onPressed:() => Navigator.pop(context),
-                child: Text('Cancelar')
-            ),
-            TextButton(
-                onPressed:(){
-                   Navigator.pop(context);
-                    _service.deleteCidade(cidade).then((_) {
-                      _refreshIndicatorkey.currentState?.show();
-               }).catchError((error, StackTrace){
-                 debugPrint(StackTrace ?? error);
-                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                   content: Text('Não foi possível remover a cidade, tente novamente')));
-                  });
-                  },
-                child: Text('OK')
-            )
-          ],
-        ));
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Atenção'),
+        content: Text('O registro "${cidade.nome} = ${cidade.uf}" '
+            'será removido definitivamente'),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.pop(context);
+                _service.deleteCidade(cidade).then((_) {
+                  _refreshIndicatorKey.currentState?.show();
+                }).catchError((error, stackTrace) {
+                  print(stackTrace ?? error);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Não foi possível remover a cidade. Tente novamente.'),
+                  ));
+                });
+              }
+          ),
+        ],
+      ),
+    );
   }
 }

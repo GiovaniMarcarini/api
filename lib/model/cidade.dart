@@ -1,10 +1,5 @@
-
-
-
-
-class Cidade{
-
-  static const campoCodigo = 'código';
+class Cidade {
+  static const campoCodigo = 'codigo';
   static const campoNome = 'nome';
   static const campoUf = 'uf';
 
@@ -17,12 +12,12 @@ class Cidade{
   factory Cidade.fromJson(Map<String, dynamic> json) => Cidade(
     codigo: int.tryParse(json[campoCodigo]?.toString() ?? ''),
     nome: json[campoNome]?.toString() ?? '',
-    uf:  json[campoUf]?.toString() ?? '');
+    uf: json[campoUf]?.toString() ?? '',
+  );
 
   Map<String, dynamic> toJson() => <String, dynamic>{
     campoCodigo: codigo,
     campoNome: nome,
     campoUf: uf,
   };
-
 }
